@@ -1,0 +1,52 @@
+<template>
+  <nav class="navbar is-success" role="navigation" aria-label="main navigation">
+    <div class="container is-max-desktop px-2">
+      <div class="navbar-brand">
+        <div class="navbar-item is-size-4 is-family-monospace" href="">
+          Notes app
+        </div>
+
+        <button role="button" class="navbar-burger" :class="{ 'is-active': showMobileNav }" aria-label="menu"
+          aria-expanded="false" data-target="navbarBasicExample" @click="showMobileNav = !showMobileNav">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div id="navbarBasicExample" class="navbar-menu" :class="{ 'is-active': showMobileNav }">
+        <div class="navbar-end">
+          <RouterLink class="navbar-item" active-class="is-active" :to="{ name: 'Notes' }">
+            Notes
+          </RouterLink>
+          <RouterLink class="navbar-item" active-class="is-active" :to="{ name: 'Stats' }">
+            Stats
+          </RouterLink>
+        </div>
+      </div>
+    </div>
+
+  </nav>
+
+
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+
+defineOptions({
+  name: 'TheNavbar'
+})
+
+const showMobileNav = ref(false)
+</script>
+
+<style scoped>
+@media (max-width: 1023px) {
+  .navbar-menu {
+    position: absolute;
+    left: 0;
+    width: 100%;
+  }
+}
+</style>
