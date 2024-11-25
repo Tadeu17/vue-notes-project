@@ -4,9 +4,9 @@
 
     <div class="field">
       <div class="control">
-        <textarea :value="modelValue" ref="textareaRef" class="textarea" :placeholder="placeholder"
-          @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)" @keydown="handleKeydown"
-          @keyup.enter.exact="$emit('textarea:keyup')" />
+        <textarea :value="modelValue" ref="textareaRef" class="textarea" :placeholder="placeholder" v-autofocus
+          maxlength="100" @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
+          @keydown="handleKeydown" @keyup.enter.exact="$emit('textarea:keyup')" />
       </div>
     </div>
 
@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { type Ref, useTemplateRef } from 'vue';
+import { vAutofocus } from '@/directives/vAutofocus';
 
 defineProps({
   modelValue: {

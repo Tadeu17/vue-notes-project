@@ -13,17 +13,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, useTemplateRef, onMounted } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import Note from '@/components/notes/TheNote.vue';
 import AddEditNote from '@/components/notes/AddEditNote.vue';
 import { useStoreNotes } from '@/stores/storeNotes';
+import { useWatchCharacters } from '@/use/useWatchCharacters';
 
 type AddEditNoteType = InstanceType<typeof AddEditNote>
 
 const notesStore = useStoreNotes()
 
 const newNote = ref('')
-onMounted(() => { addEditNoteRef.value?.focusTextarea() })
 
 const addEditNoteRef = useTemplateRef<AddEditNoteType>('addEditNoteRef')
 
@@ -35,6 +35,8 @@ const addNote = () => {
   newNote.value = ''
   addEditNoteRef.value?.focusTextarea()
 }
+
+useWatchCharacters(newNote)
 </script>
 
 <style scoped></style>
