@@ -34,9 +34,6 @@ const editNote = () => {
 
   notesStore.editNote(+route.params.id, noteContent.value)
 
-  // noteContent.value = ''
-  // addEditNoteRef.value?.focusTextarea()
-
   router.push({ name: 'notes' })
 }
 

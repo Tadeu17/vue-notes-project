@@ -1,11 +1,9 @@
 import { watch, type Ref } from "vue";
 
-export function useWatchCharacters(valueToWatch: Ref<string>) {
+export function useWatchCharacters(valueToWatch: Ref<string>, maxChars: number = 100) {
   watch(valueToWatch, (_, newVal) => {
-    if (newVal.length >= 100) {
-      console.log('Im in');
-
-      alert('only 100 chars allowed')
+    if (newVal.length >= maxChars) {
+      alert(`only ${maxChars} chars allowed`)
     }
   })
 }

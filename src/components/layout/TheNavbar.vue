@@ -6,15 +6,16 @@
           Notes app
         </div>
 
-        <button role="button" class="navbar-burger" :class="{ 'is-active': showMobileNav }" aria-label="menu"
-          aria-expanded="false" data-target="navbarBasicExample" @click="showMobileNav = !showMobileNav">
+        <button role="button" ref="navbarBurguerRef" class="navbar-burger" :class="{ 'is-active': showMobileNav }"
+          aria-label="menu" aria-expanded="false" data-target="navbarBasicExample"
+          @click="showMobileNav = !showMobileNav">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
         </button>
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu" :class="{ 'is-active': showMobileNav }">
+      <div id="navbarBasicExample" ref="navbarMenuRef" class="navbar-menu" :class="{ 'is-active': showMobileNav }">
         <div class="navbar-end">
           <RouterLink class="navbar-item" active-class="is-active" :to="{ name: 'notes' }"
             @click="showMobileNav = false">
@@ -34,13 +35,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 
 defineOptions({
   name: 'TheNavbar'
 })
 
 const showMobileNav = ref(false)
+
+const navbarMenuRef = ref(null)
+const navbarBurguerRef = useTemplateRef<HTMLButtonElement>('navbarBurguerRef')
+
+onClickOutside(navbarMenuRef, () => {
+  showMobileNav.value = false
+}, {
+  ignore: [navbarBurguerRef]
+})
 </script>
 
 <style scoped>

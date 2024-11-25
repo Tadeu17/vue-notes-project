@@ -33,7 +33,7 @@ const notesStore = useStoreNotes()
 
 const inputText = ref('')
 
-useWatchCharacters(inputText)
+useWatchCharacters(inputText, 50)
 </script>
 
 <style scoped></style>
