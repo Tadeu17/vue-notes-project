@@ -1,6 +1,6 @@
 <template>
   <div class="notes">
-    <AddEditNote v-model="newNote" ref="addEditNoteRef" @textarea:keyup="addNote">
+    <AddEditNote v-model="newNote" ref="addEditNoteRef" placeholder="Add a new note" @textarea:keyup="addNote">
       <template #buttons>
         <button class="button is-link has-background-success" :disabled="!newNote" @click="addNote">
           Add new note

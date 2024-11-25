@@ -1,8 +1,10 @@
 <template>
-  <div class="card has-background-success-dark p-4 mb-5">
+  <div class="card p-4 mb-5" :class="`has-background-${bgColor}-dark`">
+    <label v-if="label" class="label has-text-white">{{ label }}</label>
+
     <div class="field">
       <div class="control">
-        <textarea :value="modelValue" ref="textareaRef" class="textarea" placeholder="Add a new note"
+        <textarea :value="modelValue" ref="textareaRef" class="textarea" :placeholder="placeholder"
           @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)" @keydown="handleKeydown"
           @keyup.enter.exact="$emit('textarea:keyup')" />
       </div>
@@ -23,6 +25,17 @@ defineProps({
   modelValue: {
     type: String,
     required: true
+  },
+  bgColor: {
+    type: String,
+    default: 'success'
+  },
+  placeholder: {
+    type: String,
+    default: 'Type something...'
+  },
+  label: {
+    type: String
   }
 })
 

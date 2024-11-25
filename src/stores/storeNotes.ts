@@ -20,24 +20,43 @@ export const useStoreNotes = defineStore('storeNotes', () => {
     })
   }
 
+  const editNote = (id: number, content: string) => {
+    if (!(content.length > 0) || !id || id < 1) return
+
+    const note = notes.value.find((note) => note.id === id)
+
+    if (!note) {
+      console.warn('No note found with id ', id);
+      return
+    }
+
+    note.content = content
+  }
+
   const deleteNote = (id: NoteType['id']) => {
     const indexToDelete = notes.value.findIndex((note) => {
       return note.id === id
     })
-    console.log(id, indexToDelete, notes.value[indexToDelete]);
 
     if (indexToDelete !== -1) {
-      console.log('inside');
-
       notes.value.splice(indexToDelete, 1);
-    }
-    console.log(notes);
+    } else {
+      console.warn('Did not find the note');
 
+    }
+  }
+
+  const getNoteContent = (noteId: number): string => {
+    const note = notes.value.find((note) => note.id === noteId)!
+
+    return note.content
   }
 
   return {
     notes,
     addNote,
-    deleteNote
+    editNote,
+    deleteNote,
+    getNoteContent
   }
 })
