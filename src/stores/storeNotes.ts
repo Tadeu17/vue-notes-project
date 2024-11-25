@@ -1,52 +1,74 @@
 import { defineStore } from "pinia";
 import { type Note as NoteType } from "@/components/notes/type";
 import { ref } from "vue";
+import { db } from "@/plugins/firebase";
+import { collection, onSnapshot, doc, deleteDoc, updateDoc, query, orderBy, addDoc } from "firebase/firestore";
+
+const notesCollection = collection(db, 'notes')
+const notesCollectionQuery = query(notesCollection, orderBy('date', 'desc'))
 
 export const useStoreNotes = defineStore('storeNotes', () => {
-  const notes = ref<NoteType[]>([{
-    id: 1,
-    content: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem officia enim placeat sed at ipsum sit itaque eligendi temporibus? Quia distinctio minus odit exercitationem soluta ipsa nulla accusamus architecto illum!'
-  }, {
-    id: 2,
-    content: 'shorter note'
-  }])
+  const notes = ref<NoteType[]>([])
+  const notesLoaded = ref(false)
 
-  const addNote = (newNote: string) => {
-    if (!(newNote.length > 0)) return
+  const getNotes = () => {
+    notesLoaded.value = false
 
-    notes.value.unshift({
-      id: +(new Date().getTime().toString()),
-      content: newNote
+    onSnapshot(notesCollectionQuery, (sc) => {
+      notes.value = []
+
+      const newNotes: NoteType[] = []
+
+      sc.docs.forEach(doc => {
+        newNotes.push({
+          id: doc.id,
+          content: doc.data().content,
+          date: doc.data().date
+        })
+      });
+
+      // setTimeout(() => {
+      //   notes.value = newNotes
+      //   notesLoaded.value = true
+      // }, 2000)
+
+      notes.value = newNotes
+      notesLoaded.value = true
+    });
+  }
+
+  const addNote = async (newNote: string) => {
+    if (!(newNote.length > 0)) throw new Error('Wrong note text provided')
+
+    await addDoc(notesCollection, {
+      content: newNote,
+      date: new Date().getTime().toString()
     })
   }
 
-  const editNote = (id: number, content: string) => {
-    if (!(content.length > 0) || !id || id < 1) return
+  const editNote = async (id: number, content: string) => {
+    if (!(content.length > 0) || !id || id < 1) throw new Error(`Either wrong content provided or ID ${id} is invalid`)
 
-    const note = notes.value.find((note) => note.id === id)
-
-    if (!note) {
-      console.warn('No note found with id ', id);
-      return
-    }
-
-    note.content = content
-  }
-
-  const deleteNote = (id: NoteType['id']) => {
-    const indexToDelete = notes.value.findIndex((note) => {
-      return note.id === id
-    })
-
-    if (indexToDelete !== -1) {
-      notes.value.splice(indexToDelete, 1);
-    } else {
-      console.warn('Did not find the note');
-
+    try {
+      await updateDoc(doc(notesCollection, id.toString()), {
+        content
+      })
+    } catch (error: unknown) {
+      throw new Error(error instanceof Error ? error.message : String(error))
     }
   }
 
-  const getNoteContent = (noteId: number): string => {
+  const deleteNote = async (id: NoteType['id']) => {
+    if (!id || id.length < 1) throw new Error(`ID ${id} is invalid`)
+
+    try {
+      await deleteDoc(doc(notesCollection, id.toString()))
+    } catch (error: unknown) {
+      throw new Error(error instanceof Error ? error.message : String(error))
+    }
+  }
+
+  const getNoteContent = (noteId: string): string => {
     const note = notes.value.find((note) => note.id === noteId)!
 
     return note.content
@@ -67,6 +89,8 @@ export const useStoreNotes = defineStore('storeNotes', () => {
 
   return {
     notes,
+    notesLoaded,
+    getNotes,
     addNote,
     editNote,
     deleteNote,

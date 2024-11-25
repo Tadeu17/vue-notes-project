@@ -25,9 +25,9 @@ const route = useRoute()
 const router = useRouter()
 
 const noteContent = ref('')
-const noteId = route.params.id
+const noteId = route.params.id as string
 
-noteContent.value = notesStore.getNoteContent(+noteId)
+noteContent.value = notesStore.getNoteContent(noteId)
 
 const editNote = () => {
   if (!(noteContent.value.length > 0)) return
