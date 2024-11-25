@@ -1,6 +1,6 @@
 <template>
   <div class="notes">
-    <AddEditNote v-model="newNote" ref="addEditNoteRef">
+    <AddEditNote v-model="newNote" ref="addEditNoteRef" @textarea:keyup="addNote">
       <template #buttons>
         <button class="button is-link has-background-success" :disabled="!newNote" @click="addNote">
           Add new note
@@ -33,9 +33,6 @@ const addNote = () => {
   notesStore.addNote(newNote.value)
 
   newNote.value = ''
-
-  console.log(addEditNoteRef.value);
-
   addEditNoteRef.value?.focusTextarea()
 }
 </script>

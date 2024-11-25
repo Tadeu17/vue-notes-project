@@ -4,7 +4,7 @@
       <div class="control">
         <textarea :value="modelValue" ref="textareaRef" class="textarea" placeholder="Add a new note"
           @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)" @keydown="handleKeydown"
-          @keyup.enter.exact="handleKeyUp" />
+          @keyup.enter.exact="$emit('textarea:keyup')" />
       </div>
     </div>
 
@@ -18,18 +18,15 @@
 
 <script setup lang="ts">
 import { type Ref, useTemplateRef } from 'vue';
-import { useStoreNotes } from '@/stores/storeNotes';
 
-const notesStore = useStoreNotes()
-
-const props = defineProps({
+defineProps({
   modelValue: {
     type: String,
     required: true
   }
 })
 
-defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue', 'textarea:keyup'])
 
 const textAreaRef = useTemplateRef('textareaRef') as Ref<HTMLTextAreaElement | null>
 
@@ -45,13 +42,6 @@ const handleKeydown = (event: KeyboardEvent) => {
     event.preventDefault(); // Prevents the default behavior of adding a line break
   }
 };
-
-const handleKeyUp = () => {
-  if (props.modelValue) {
-    notesStore.addNote(props.modelValue)
-    focusTextarea()
-  }
-}
 </script>
 
 <style scoped></style>
