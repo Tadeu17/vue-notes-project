@@ -17,15 +17,13 @@
       </div>
     </div>
 
-    <Note class="mb-4" :note="note" v-for="note in notesStore.notes" :key="note.id"
-      @delete-clicked="deleteNote(note.id)" />
+    <Note class="mb-4" :note="note" v-for="note in notesStore.notes" :key="note.id" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { type Ref, ref, useTemplateRef } from 'vue'
 import Note from '@/components/notes/TheNote.vue';
-import { type Note as NoteType } from '@/components/notes/type';
 import { useStoreNotes } from '@/stores/storeNotes';
 
 const notesStore = useStoreNotes()
@@ -43,24 +41,10 @@ const handleKeydown = (event: KeyboardEvent) => {
 const addNote = () => {
   if (!(newNote.value.length > 0)) return
 
-  notesStore.notes.unshift({
-    id: +(new Date().getTime().toString()),
-    content: newNote.value
-  })
+  notesStore.addNote(newNote.value)
 
   newNote.value = ''
   textAreaRef.value?.focus()
-
-}
-
-const deleteNote = (id: NoteType['id']) => {
-  const idNoteToDelete = notesStore.notes.findIndex((note) => {
-    return note.id === id
-  })
-
-  if (idNoteToDelete !== -1) {
-    notesStore.notes.splice(idNoteToDelete, 1);
-  }
 }
 </script>
 
