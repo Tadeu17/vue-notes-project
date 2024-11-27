@@ -2,19 +2,43 @@ import { defineStore } from "pinia";
 import { type Note as NoteType } from "@/components/notes/type";
 import { ref } from "vue";
 import { db } from "@/plugins/firebase";
-import { collection, onSnapshot, doc, deleteDoc, updateDoc, query, orderBy, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, deleteDoc, updateDoc, query, orderBy, addDoc, type Unsubscribe } from "firebase/firestore";
+import { useStoreAuth } from "./storeAuth";
+import { CollectionReference, Query, type DocumentData } from "firebase/firestore";
 
-const notesCollection = collection(db, 'notes')
-const notesCollectionQuery = query(notesCollection, orderBy('date', 'desc'))
+let notesCollection: CollectionReference;
+let notesCollectionQuery: Query<DocumentData>;
+let getNotesSnapshot: Unsubscribe | undefined;
 
 export const useStoreNotes = defineStore('storeNotes', () => {
   const notes = ref<NoteType[]>([])
   const notesLoaded = ref(false)
 
+  const init = () => {
+    const storeAuth = useStoreAuth()
+    if (!storeAuth.user?.id) {
+      throw new Error('User is not authenticated.');
+    }
+
+    // Avoid re-initializing if already loaded
+    if (notesLoaded.value) return;
+    notesCollection = collection(db, 'users', storeAuth.user.id, 'notes')
+    notesCollectionQuery = query(notesCollection, orderBy('date', 'desc'))
+
+    getNotes()
+  }
+
+  const clearNotes = () => {
+    notes.value = []
+    notesLoaded.value = false
+
+    if (getNotesSnapshot) getNotesSnapshot()
+  }
+
   const getNotes = () => {
     notesLoaded.value = false
 
-    onSnapshot(notesCollectionQuery, (sc) => {
+    getNotesSnapshot = onSnapshot(notesCollectionQuery, (sc) => {
       notes.value = []
 
       const newNotes: NoteType[] = []
@@ -34,6 +58,8 @@ export const useStoreNotes = defineStore('storeNotes', () => {
 
       notes.value = newNotes
       notesLoaded.value = true
+    }, (error: Error) => {
+      console.error(error.message)
     });
   }
 
@@ -90,6 +116,8 @@ export const useStoreNotes = defineStore('storeNotes', () => {
   return {
     notes,
     notesLoaded,
+    init,
+    clearNotes,
     getNotes,
     addNote,
     editNote,

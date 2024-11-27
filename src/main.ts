@@ -12,6 +12,6 @@ pinia.use(({ store }) => {
 })
 
 createApp(App)
-  .use(pinia)
   .use(router)
+  .use(pinia)
   .mount('#app')

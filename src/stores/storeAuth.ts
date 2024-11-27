@@ -3,6 +3,7 @@ import { auth } from "@/plugins/firebase";
 import { createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { ref } from "vue";
 import { router } from "@/router";
+import { useStoreNotes } from "./storeNotes";
 
 type User = {
   id: string | null,
@@ -12,6 +13,7 @@ type User = {
 export const useStoreAuth = defineStore('storeAuth', () => {
   const user = ref<User | null>(null)
 
+  const storeNotes = useStoreNotes()
 
   const init = () => {
     onAuthStateChanged(auth, (authUser) => {
@@ -22,10 +24,24 @@ export const useStoreAuth = defineStore('storeAuth', () => {
           id: authUser.uid,
           email: authUser.email
         }
-        router.push({ name: 'notes' })
+
+        // Initialize notes (only once per session)
+        if (!storeNotes.notesLoaded) {
+          storeNotes.init();
+        }
+
+        // Navigate to 'notes' only if not already there
+        if (router.currentRoute.value.name !== 'notes') {
+          router.push({ name: 'notes' });
+        }
       } else {
         user.value = null
-        router.replace({ name: 'auth' })
+        storeNotes.clearNotes()
+
+        // Navigate to 'auth'
+        if (router.currentRoute.value.name !== 'auth') {
+          router.replace({ name: 'auth' });
+        }
       }
     });
   }
